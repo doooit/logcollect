@@ -6,6 +6,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.common.PartitionInfo;
 import org.apache.kafka.common.TopicPartition;
+import org.apache.log4j.Logger;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -13,6 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Main {
+    public static Logger loger = Logger.getLogger("Main");
     public static void main(String[] args) {
 
         //1.创建spring的ioc容器对象
@@ -36,13 +38,15 @@ public class Main {
 
                     // 当前 offset
                     curOffset.put(pi.partition(), offset);
+//                    curOffset.put(pi.partition(), 0L);
+                    loger.debug("seek partition " + pi.partition() + " to " + offset);
                 }
 
                 restored = true;
             }
 
             if (!records.isEmpty()) {
-                System.out.println("========================Begin========================");
+                loger.debug("========================Begin========================");
             }
 
             for (ConsumerRecord<String, String> record : records) {
@@ -54,12 +58,12 @@ public class Main {
                 try{
                     JSONObject jb = JSON.parseObject(record.value());
                     if (jb != null) {
-                        System.out.println("recordOffset = " + record.offset() + ", recordPartition = " + record.partition() + ", recordValue = " + record.value());
+                        loger.debug("recordOffset = " + record.offset() + ", recordPartition = " + record.partition() + ", recordValue = " + record.value());
                     } else {
-                        System.out.println("recordOffset = " + record.offset() + ", recordPartition = " + record.partition() + ", Empty message.");
+                        loger.debug("recordOffset = " + record.offset() + ", recordPartition = " + record.partition() + ", Empty message.");
                     }
                 } catch(JSONException ex) {
-                    System.out.println("recordOffset = " + record.offset() + ", recordPartition = " + record.partition() + ", recordValue = " + record.value());
+                    loger.debug("recordOffset = " + record.offset() + ", recordPartition = " + record.partition() + ", recordValue = " + record.value());
                 }
 
             }
@@ -67,11 +71,11 @@ public class Main {
             if (!records.isEmpty()) {
                 for (Map.Entry<Integer, Long> mapEntry : curOffset.entrySet()) {
                     // offset 写入到 zookeeper
-                    System.out.println("partition is " + mapEntry.getKey() + ", offset is " + mapEntry.getValue());
+                    loger.debug("partition is " + mapEntry.getKey() + ", offset is " + mapEntry.getValue());
                     logConsumer.commitOffset(mapEntry.getKey(), mapEntry.getValue());
                 }
 
-                System.out.println("========================End========================");
+                loger.debug("========================End========================");
             }
         }
     }
