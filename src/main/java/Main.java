@@ -25,6 +25,7 @@ public class Main {
 
         boolean restored = false;
         Map<Integer, Long> curOffset = new HashMap<>();
+        Map<Integer, Boolean> modifyFlag = new HashMap<>();
 
         while (true) {
             ConsumerRecords<String, String> records = logConsumer.poll(100);
@@ -38,7 +39,7 @@ public class Main {
 
                     // 当前 offset
                     curOffset.put(pi.partition(), offset);
-//                    curOffset.put(pi.partition(), 0L);
+                    modifyFlag.put(pi.partition(), false);
                     loger.debug("seek partition " + pi.partition() + " to " + offset);
                 }
 
@@ -53,6 +54,7 @@ public class Main {
                 // 记录当前 offset
                 if (curOffset.get(record.partition()) < record.offset()) {
                     curOffset.put(record.partition(), record.offset());
+                    modifyFlag.put(record.partition(), true);
                 }
 
                 try{
@@ -71,8 +73,10 @@ public class Main {
             if (!records.isEmpty()) {
                 for (Map.Entry<Integer, Long> mapEntry : curOffset.entrySet()) {
                     // offset 写入到 zookeeper
-                    loger.debug("partition is " + mapEntry.getKey() + ", offset is " + mapEntry.getValue());
-                    logConsumer.commitOffset(mapEntry.getKey(), mapEntry.getValue());
+                    if (modifyFlag.get(mapEntry.getKey())) {
+                        loger.debug("partition is " + mapEntry.getKey() + ", offset is " + mapEntry.getValue());
+                        logConsumer.commitOffset(mapEntry.getKey(), mapEntry.getValue());
+                    }
                 }
 
                 loger.debug("========================End========================");

@@ -1,6 +1,6 @@
 package essw.com.kafka;
 
-import essw.com.utils.KafkaOffsetZKUtil;
+import essw.com.utils.KafkaOffsetZKMgr;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 
 import java.util.Arrays;
@@ -22,23 +22,23 @@ public class LogCollectKafkaConsumer extends KafkaConsumer<String, String>{
         prop.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
     }
 
-    private KafkaOffsetZKUtil kafkaOffsetZKUtil = null;
+    private KafkaOffsetZKMgr kafkaOffsetZKUtil = null;
 
     public LogCollectKafkaConsumer() {
         super(prop);
 
         this.subscribe(Arrays.asList(TOPIC_NAME));
 
-        kafkaOffsetZKUtil = new KafkaOffsetZKUtil(ZK_SERVERS);
+        kafkaOffsetZKUtil = new KafkaOffsetZKMgr(ZK_SERVERS);
     }
 
     public Long fetchOffset(Integer partition) {
-        return kafkaOffsetZKUtil.readOffset(TOPIC_NAME, Arrays.asList(partition)).get(partition);
+        return kafkaOffsetZKUtil.readOffset(TOPIC_NAME, GROUP_NAME, Arrays.asList(partition)).get(partition);
     }
 
     public boolean commitOffset(Integer partition, Long offset) {
         // offset + 1 => ack + 1
-        return kafkaOffsetZKUtil.writeOffset(TOPIC_NAME, partition, offset + 1);
+        return kafkaOffsetZKUtil.writeOffset(TOPIC_NAME, GROUP_NAME, partition, offset + 1);
     }
 }
 
