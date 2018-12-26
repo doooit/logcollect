@@ -5,4 +5,7 @@
 
     <bean id="LogCollectKafkaConsumer" class="essw.com.kafka.LogCollectKafkaConsumer">
     </bean>
+
+    <bean id="LogCollectKafkaProducer" class="essw.com.kafka.LogCollectKafkaProducer">
+    </bean>
 </beans>

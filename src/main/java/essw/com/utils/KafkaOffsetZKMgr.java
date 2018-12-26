@@ -18,10 +18,14 @@ public class KafkaOffsetZKMgr {
         zkClient = new ZkClient(uri, 3000);
     }
 
+    private String getRootPath() {
+        return "/" + "kafka-consumer";
+    }
 
     private String getTopicPath(String topic) {
         StringBuffer sb = new StringBuffer();
-        sb.append("/kafka-consumer/");
+        sb.append(getRootPath());
+        sb.append("/");
         sb.append(topic);
         return sb.toString();
     }

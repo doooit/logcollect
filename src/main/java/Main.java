@@ -1,86 +1,54 @@
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONException;
-import com.alibaba.fastjson.JSONObject;
 import essw.com.kafka.LogCollectKafkaConsumer;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.apache.kafka.clients.consumer.ConsumerRecords;
-import org.apache.kafka.common.PartitionInfo;
-import org.apache.kafka.common.TopicPartition;
+import essw.com.kafka.LogCollectKafkaProducer;
+import org.apache.commons.cli.*;
 import org.apache.log4j.Logger;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Scanner;
+
 
 public class Main {
     public static Logger loger = Logger.getLogger("Main");
-    public static void main(String[] args) {
+    public static void main(String[] args) throws ParseException {
+        Options options = new Options();
+        //boolean型的option
+        options.addOption("help",false,"help information");
+        //当第二参数是true时，可以是这样的参数  -O4
+        options.addOption("role",true,"specify your role: notifier/scheduler");
+
+        //parser
+        CommandLineParser parser = new DefaultParser();
+
+        CommandLine cmd = parser.parse(options, args);
+        if(cmd.hasOption("help")) {
+            //调用默认的help函数打印
+            HelpFormatter formatter = new HelpFormatter();
+            formatter.printHelp( "java -jar xxx.jar -role <notifier/scheduler> <OPTION>", options );
+            return;
+        }
 
         //1.创建spring的ioc容器对象
         ApplicationContext ctx = new ClassPathXmlApplicationContext("META-INF/applicationContext.xml");
 
-        //2.从ioc容器中获取bean实例
-        LogCollectKafkaConsumer logConsumer = (LogCollectKafkaConsumer) ctx.getBean("LogCollectKafkaConsumer");
+        if (cmd.getOptionValue("role").equals("scheduler")) {
+            //2.从ioc容器中获取bean实例
+            LogCollectKafkaConsumer logConsumer = (LogCollectKafkaConsumer) ctx.getBean("LogCollectKafkaConsumer");
+            logConsumer.run();
+        } else if (cmd.getOptionValue("role").equals("notifier")){
+            LogCollectKafkaProducer logProducer = (LogCollectKafkaProducer) ctx.getBean("LogCollectKafkaProducer");
 
-        boolean restored = false;
-        Map<Integer, Long> curOffset = new HashMap<>();
-        Map<Integer, Boolean> modifyFlag = new HashMap<>();
+            Scanner input = new Scanner(System.in);
 
-        while (true) {
-            ConsumerRecords<String, String> records = logConsumer.poll(100);
-
-            if (!restored) {
-                // 恢复消费 offset
-                for (PartitionInfo pi: logConsumer.partitionsFor(LogCollectKafkaConsumer.TOPIC_NAME)) {
-                    Long offset = logConsumer.fetchOffset(pi.partition());
-                    TopicPartition tp = new TopicPartition(LogCollectKafkaConsumer.TOPIC_NAME, pi.partition());
-                    logConsumer.seek(tp, offset);
-
-                    // 当前 offset
-                    curOffset.put(pi.partition(), offset);
-                    modifyFlag.put(pi.partition(), false);
-                    loger.debug("seek partition " + pi.partition() + " to " + offset);
+            while (true) {
+                String message = input.nextLine();
+                if (message.equals("quit")) {
+                    loger.debug("Receive quit message, quiting...");
+                    break;
                 }
-
-                restored = true;
-            }
-
-            if (!records.isEmpty()) {
-                loger.debug("========================Begin========================");
-            }
-
-            for (ConsumerRecord<String, String> record : records) {
-                // 记录当前 offset
-                if (curOffset.get(record.partition()) < record.offset()) {
-                    curOffset.put(record.partition(), record.offset());
-                    modifyFlag.put(record.partition(), true);
-                }
-
-                try{
-                    JSONObject jb = JSON.parseObject(record.value());
-                    if (jb != null) {
-                        loger.debug("recordOffset = " + record.offset() + ", recordPartition = " + record.partition() + ", recordValue = " + record.value());
-                    } else {
-                        loger.debug("recordOffset = " + record.offset() + ", recordPartition = " + record.partition() + ", Empty message.");
-                    }
-                } catch(JSONException ex) {
-                    loger.debug("recordOffset = " + record.offset() + ", recordPartition = " + record.partition() + ", recordValue = " + record.value());
-                }
-
-            }
-
-            if (!records.isEmpty()) {
-                for (Map.Entry<Integer, Long> mapEntry : curOffset.entrySet()) {
-                    // offset 写入到 zookeeper
-                    if (modifyFlag.get(mapEntry.getKey())) {
-                        loger.debug("partition is " + mapEntry.getKey() + ", offset is " + mapEntry.getValue());
-                        logConsumer.commitOffset(mapEntry.getKey(), mapEntry.getValue());
-                    }
-                }
-
-                loger.debug("========================End========================");
+                logProducer.produce(message);
             }
         }
+
     }
 }
