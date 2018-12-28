@@ -3,9 +3,9 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <bean id="LogCollectKafkaConsumer" class="essw.com.kafka.LogCollectKafkaConsumer">
+    <bean id="KafkaTaskHandler" class="essw.com.kafka.KafkaTaskHandler">
     </bean>
 
-    <bean id="LogCollectKafkaProducer" class="essw.com.kafka.LogCollectKafkaProducer">
+    <bean id="KafkaTaskProducer" class="essw.com.kafka.KafkaTaskProducer">
     </bean>
 </beans>

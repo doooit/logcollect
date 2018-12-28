@@ -2,13 +2,19 @@ package essw.com.kafka;
 
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.log4j.Logger;
 
 import java.util.Properties;
+import java.util.concurrent.ExecutionException;
 
-public class LogCollectKafkaProducer extends KafkaProducer<String, String> {
+public class KafkaTaskProducer {
+    public static Logger logger = Logger.getLogger("KafkaTaskProducer");
+
     static Properties prop = null;
     public static String TOPIC_NAME = "LogNotify";
     public static String KAFKA_SERVERS = "node4:9092,node5:9092,node6:9092";
+
+    private KafkaProducer<String, String> producer = null;
 
     static {
         prop = new Properties();
@@ -23,20 +29,24 @@ public class LogCollectKafkaProducer extends KafkaProducer<String, String> {
         prop.put("value.serializer","org.apache.kafka.common.serialization.StringSerializer");
     }
 
-    public LogCollectKafkaProducer() {
-        super(prop);
+    public KafkaTaskProducer() {
+        producer= new KafkaProducer<>(prop);
     }
 
     public void produce(String message) {
-        this.send(new ProducerRecord<>(TOPIC_NAME, (Integer)null, (Long)null, "key", message));
+        try {
+            producer.send(new ProducerRecord<>(TOPIC_NAME, null, null, "key", message)).get();
+        } catch (InterruptedException e) {
+            logger.error("send msg fail: " + e.toString());
+            System.exit(1);
+        } catch (ExecutionException e) {
+            logger.error("send msg fail: " + e.toString());
+            System.exit(1);
+        }
     }
 
     @Override
-    protected void finalize() throws Throwable {
-        this.close();
-
-        super.finalize();
+    protected void finalize() {
+        producer.close();
     }
 }
-
-

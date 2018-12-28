@@ -15,12 +15,6 @@
     </properties>
 
 
-    <!--<parent>-->
-        <!--<groupId>org.springframework.boot</groupId>-->
-        <!--<artifactId>spring-boot-starter-parent</artifactId>-->
-        <!--<version>1.5.16.RELEASE</version>-->
-    <!--</parent>-->
-
     <dependencies>
         <!-- spring start -->
         <dependency>
@@ -29,13 +23,6 @@
             <version>${org.springframework.version}</version>
         </dependency>
         <!-- spring end -->
-
-        <!-- springboot start -->
-        <!--<dependency>-->
-            <!--<groupId>org.springframework.boot</groupId>-->
-            <!--<artifactId>spring-boot-starter-web</artifactId>-->
-        <!--</dependency>-->
-        <!-- springboot end -->
 
         <!-- arguments parser begin -->
         <dependency>
@@ -107,14 +94,5 @@
             </plugin>
         </plugins>
 
-        <!--<resources>-->
-            <!--<resource>-->
-                <!--<directory>src\main\resources</directory>-->
-                <!--<targetPath>META-INF</targetPath>-->
-                <!--<includes>-->
-                    <!--<include>*.*</include>-->
-                <!--</includes>-->
-            <!--</resource>-->
-        <!--</resources>-->
     </build>
 </project>

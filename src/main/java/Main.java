@@ -1,21 +1,18 @@
-import essw.com.kafka.LogCollectKafkaConsumer;
-import essw.com.kafka.LogCollectKafkaProducer;
+import essw.com.kafka.KafkaTaskHandler;
+import essw.com.kafka.KafkaTaskProducer;
 import org.apache.commons.cli.*;
 import org.apache.log4j.Logger;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import java.util.Scanner;
-
-
 public class Main {
-    public static Logger loger = Logger.getLogger("Main");
+    public static Logger logger = Logger.getLogger("Main");
     public static void main(String[] args) throws ParseException {
         Options options = new Options();
-        //boolean型的option
         options.addOption("help",false,"help information");
-        //当第二参数是true时，可以是这样的参数  -O4
         options.addOption("role",true,"specify your role: notifier/scheduler");
+
+        options.addOption("msg",true,"message to send, only active in <notifier> role");
 
         //parser
         CommandLineParser parser = new DefaultParser();
@@ -28,25 +25,22 @@ public class Main {
             return;
         }
 
-        //1.创建spring的ioc容器对象
+
+        // 使用 spring 来管理实例
         ApplicationContext ctx = new ClassPathXmlApplicationContext("applicationContext.xml");
 
         if (cmd.getOptionValue("role").equals("scheduler")) {
-            //2.从ioc容器中获取bean实例
-            LogCollectKafkaConsumer logConsumer = (LogCollectKafkaConsumer) ctx.getBean("LogCollectKafkaConsumer");
+            KafkaTaskHandler logConsumer = (KafkaTaskHandler) ctx.getBean("KafkaTaskHandler");
             logConsumer.run();
         } else if (cmd.getOptionValue("role").equals("notifier")){
-            LogCollectKafkaProducer logProducer = (LogCollectKafkaProducer) ctx.getBean("LogCollectKafkaProducer");
-
-            Scanner input = new Scanner(System.in);
-
-            while (true) {
-                String message = input.nextLine();
-                if (message.equals("quit")) {
-                    loger.debug("Receive quit message, quiting...");
-                    break;
-                }
-                logProducer.produce(message);
+            KafkaTaskProducer logProducer = (KafkaTaskProducer) ctx.getBean("KafkaTaskProducer");
+            if(cmd.hasOption("msg")) {
+                String msg = cmd.getOptionValue("msg");
+                logProducer.produce(msg);
+                logger.info("produce new msg: " + msg);
+            } else {
+                logger.error("please specify message.");
+                System.exit(1);
             }
         }
 
