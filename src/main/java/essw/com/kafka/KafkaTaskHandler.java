@@ -9,7 +9,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.PartitionInfo;
 import org.apache.kafka.common.TopicPartition;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.Properties;
 
 public class KafkaTaskHandler {
-    public static Logger logger = Logger.getLogger("KafkaTaskHandler");
+    protected static final org.slf4j.Logger logger = LoggerFactory.getLogger(KafkaTaskHandler.class);
 
     static Properties prop = null;
     public static String TOPIC_NAME = "LogNotify";

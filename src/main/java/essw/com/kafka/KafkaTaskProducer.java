@@ -2,13 +2,13 @@ package essw.com.kafka;
 
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Properties;
 import java.util.concurrent.ExecutionException;
 
 public class KafkaTaskProducer {
-    public static Logger logger = Logger.getLogger("KafkaTaskProducer");
+    protected static final org.slf4j.Logger logger = LoggerFactory.getLogger(KafkaTaskProducer.class);
 
     static Properties prop = null;
     public static String TOPIC_NAME = "LogNotify";
