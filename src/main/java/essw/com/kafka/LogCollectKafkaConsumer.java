@@ -100,7 +100,6 @@ public class LogCollectKafkaConsumer extends KafkaConsumer<String, String>{
                     } catch(JSONException ex) {
                         loger.info("recordOffset = " + record.offset() + ", recordPartition = " + record.partition() + ", recordValue = " + record.value());
                     }
-
                 }
 
                 // 3. 消费之后，确认当前消费 offset
