@@ -13,6 +13,8 @@ public class Task {
 
     private Integer taskStatus;
 
+    private Date addOn;
+
     private Date startOn;
 
     private Date finishOn;
@@ -59,6 +61,14 @@ public class Task {
 
     public void setTaskStatus(Integer taskStatus) {
         this.taskStatus = taskStatus;
+    }
+
+    public Date getAddOn() {
+        return addOn;
+    }
+
+    public void setAddOn(Date addOn) {
+        this.addOn = addOn;
     }
 
     public Date getStartOn() {

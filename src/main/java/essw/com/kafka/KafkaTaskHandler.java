@@ -3,6 +3,8 @@ package essw.com.kafka;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
+import essw.com.scheduler.mapper.TaskMapper;
+import essw.com.scheduler.model.Task;
 import essw.com.utils.KafkaOffsetZKMgr;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
@@ -10,14 +12,20 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.PartitionInfo;
 import org.apache.kafka.common.TopicPartition;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
+@Component
 public class KafkaTaskHandler {
+
     protected static final org.slf4j.Logger logger = LoggerFactory.getLogger(KafkaTaskHandler.class);
+
+    @Autowired
+    private TaskMapper taskMapper;
 
     static Properties prop = null;
     public static String TOPIC_NAME = "LogNotify";
@@ -97,6 +105,11 @@ public class KafkaTaskHandler {
                         JSONObject jb = JSON.parseObject(record.value());
                         if (jb != null) {
                             logger.info("recordOffset = " + record.offset() + ", recordPartition = " + record.partition() + ", recordValue = " + record.value());
+                            Task task = new Task();
+                            task.setTaskType("RemoteLogPrepare");
+                            task.setHandleObj("SafeClick");
+                            task.setDealDatetime(new Date());
+                            taskMapper.insertSelective(task);
                         } else {
                             logger.error("recordOffset = " + record.offset() + ", recordPartition = " + record.partition() + ", Empty message, skip it.");
                         }

@@ -35,7 +35,7 @@ public class KafkaTaskProducer {
 
     public void produce(String message) {
         try {
-            producer.send(new ProducerRecord<>(TOPIC_NAME, null, null, "key", message)).get();
+            producer.send(new ProducerRecord<>(TOPIC_NAME, null, null, null, message)).get();
         } catch (InterruptedException e) {
             logger.error("send msg fail: " + e.toString());
             System.exit(1);

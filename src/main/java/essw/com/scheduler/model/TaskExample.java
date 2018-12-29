@@ -425,6 +425,66 @@ public class TaskExample {
             return (Criteria) this;
         }
 
+        public Criteria andAddOnIsNull() {
+            addCriterion("add_on is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAddOnIsNotNull() {
+            addCriterion("add_on is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAddOnEqualTo(Date value) {
+            addCriterion("add_on =", value, "addOn");
+            return (Criteria) this;
+        }
+
+        public Criteria andAddOnNotEqualTo(Date value) {
+            addCriterion("add_on <>", value, "addOn");
+            return (Criteria) this;
+        }
+
+        public Criteria andAddOnGreaterThan(Date value) {
+            addCriterion("add_on >", value, "addOn");
+            return (Criteria) this;
+        }
+
+        public Criteria andAddOnGreaterThanOrEqualTo(Date value) {
+            addCriterion("add_on >=", value, "addOn");
+            return (Criteria) this;
+        }
+
+        public Criteria andAddOnLessThan(Date value) {
+            addCriterion("add_on <", value, "addOn");
+            return (Criteria) this;
+        }
+
+        public Criteria andAddOnLessThanOrEqualTo(Date value) {
+            addCriterion("add_on <=", value, "addOn");
+            return (Criteria) this;
+        }
+
+        public Criteria andAddOnIn(List<Date> values) {
+            addCriterion("add_on in", values, "addOn");
+            return (Criteria) this;
+        }
+
+        public Criteria andAddOnNotIn(List<Date> values) {
+            addCriterion("add_on not in", values, "addOn");
+            return (Criteria) this;
+        }
+
+        public Criteria andAddOnBetween(Date value1, Date value2) {
+            addCriterion("add_on between", value1, value2, "addOn");
+            return (Criteria) this;
+        }
+
+        public Criteria andAddOnNotBetween(Date value1, Date value2) {
+            addCriterion("add_on not between", value1, value2, "addOn");
+            return (Criteria) this;
+        }
+
         public Criteria andStartOnIsNull() {
             addCriterion("start_on is null");
             return (Criteria) this;
