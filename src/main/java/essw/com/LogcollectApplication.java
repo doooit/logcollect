@@ -3,6 +3,7 @@ package essw.com;
 import essw.com.kafka.KafkaTaskHandler;
 import essw.com.kafka.KafkaTaskProducer;
 import org.apache.commons.cli.*;
+import org.mybatis.spring.annotation.MapperScan;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -12,6 +13,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 @SpringBootApplication
+@MapperScan("essw.com.scheduler.mapper")
 public class LogcollectApplication implements CommandLineRunner {
 
     protected static final Logger logger = LoggerFactory.getLogger(LogcollectApplication.class);
@@ -23,7 +25,6 @@ public class LogcollectApplication implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws ParseException {
-        System.out.println("nihao");
         Options options = new Options();
         options.addOption("help",false,"help information");
         options.addOption("role",true,"specify your role: notifier/scheduler");
